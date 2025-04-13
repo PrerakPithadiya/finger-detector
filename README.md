@@ -9,9 +9,9 @@ A Python application that uses computer vision to detect and count fingers in re
 
 <div align="center">
 
-![Finger Detection Demo](https://raw.githubusercontent.com/wiki/google/mediapipe/images/mobile/hand_tracking_3d_android_gpu.gif)
+![Finger Detection Demo](images/finger_detector_demo.png)
 
-*Note: Sample image from MediaPipe - your application will have a custom UI*
+*Screenshot of the Finger Detector application in action*
 
 </div>
 
@@ -168,8 +168,72 @@ Contributions are welcome! If you'd like to improve the project:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🧪 Testing
+
+To test the application and verify it's working correctly:
+
+1. **Basic Functionality Test**:
+   - Run the application with `python main.py`
+   - Show different numbers of fingers to the camera
+   - Verify the finger count updates correctly
+   - Test with both hands in the frame simultaneously
+
+2. **Performance Testing**:
+   - Check the FPS counter in the top-left corner
+   - Typical performance should be 15-30 FPS on modern hardware
+   - If FPS drops below 10, consider reducing video resolution
+
+3. **Lighting Conditions**:
+   - Test in different lighting conditions
+   - The application should work best in well-lit environments
+   - Avoid strong backlighting which can create silhouettes
+
+4. **Hand Positioning**:
+   - Test with hands at different distances from the camera
+   - Optimal distance is typically 20-80 cm from the camera
+   - Ensure your full hand is visible in the frame
+
+## 🔮 Future Work
+
+Potential enhancements for future versions:
+
+1. **Gesture Recognition**:
+   - Implement recognition of common gestures (thumbs up, peace sign, etc.)
+   - Add customizable gesture commands
+
+2. **UI Improvements**:
+   - Create a more interactive dashboard
+   - Add settings panel for adjusting detection parameters
+   - Implement dark/light mode toggle
+
+3. **Performance Optimization**:
+   - Optimize for lower-end hardware
+   - Add GPU acceleration options
+
+4. **Additional Features**:
+   - Hand distance estimation
+   - 3D hand pose visualization
+   - Integration with other applications via API
+
+5. **Cross-Platform Support**:
+   - Create mobile versions (Android/iOS)
+   - Develop web-based version using WebRTC
+
+## 📚 Academic References
+
+This project builds upon research in computer vision and hand tracking:
+
+1. Zhang, F., Bazarevsky, V., Vakunov, A., Tkachenka, A., Sung, G., Chang, C. L., & Grundmann, M. (2020). MediaPipe Hands: On-device Real-time Hand Tracking. *CVPR Workshop on Computer Vision for Augmented and Virtual Reality*. [arXiv:2006.10214](https://arxiv.org/abs/2006.10214)
+
+2. Lugaresi, C., Tang, J., Nash, H., McClanahan, C., Uboweja, E., Hays, M., ... & Grundmann, M. (2019). MediaPipe: A Framework for Building Perception Pipelines. *arXiv preprint*. [arXiv:1906.08172](https://arxiv.org/abs/1906.08172)
+
+3. Bradski, G. (2000). The OpenCV Library. *Dr. Dobb's Journal of Software Tools*.
+
+4. Erol, A., Bebis, G., Nicolescu, M., Boyle, R. D., & Twombly, X. (2007). Vision-based hand pose estimation: A review. *Computer Vision and Image Understanding*, 108(1-2), 52-73.
+
 ## 🙏 Acknowledgements
 
 - [MediaPipe](https://google.github.io/mediapipe/) for their excellent hand tracking solution
 - [OpenCV](https://opencv.org/) for computer vision capabilities
 - All contributors and users of this project
+- My college professors for guidance and support in computer vision concepts

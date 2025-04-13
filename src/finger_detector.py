@@ -41,66 +41,96 @@ class FingerDetector:
         self.wrist = 0
 
     def count_fingers(self, landmarks, hand_type):
-        """Count the number of extended fingers using a more robust method"""
+        """Count the number of extended fingers using a more robust method
+        
+        Args:
+            landmarks: MediaPipe hand landmarks (21 points)
+            hand_type: String indicating 'Left' or 'Right' hand
+            
+        Returns:
+            count: Integer representing number of extended fingers (0-5)
+        """
         count = 0
 
-        # Get hand dimensions
-        hand_width = self.get_hand_width(landmarks)
-        hand_height = self.get_hand_height(landmarks)
-        hand_size = max(hand_width, hand_height)
+        # Get hand dimensions to scale thresholds appropriately for different hand sizes and distances from camera
+        hand_width = self.get_hand_width(landmarks)  # Width between thumb and pinky MCP joints
+        hand_height = self.get_hand_height(landmarks)  # Height from wrist to middle fingertip
+        hand_size = max(hand_width, hand_height)  # Use the larger dimension for threshold scaling
 
-        # Improved thumb detection that works better for folded thumbs
+        # SECTION 1: THUMB DETECTION
+        # Thumb detection is challenging because it has different movement patterns than other fingers
+        # We use a combination of angle and distance metrics for more accurate detection
+        
         # Get relevant landmarks for thumb detection
-        thumb_tip = landmarks[self.fingertips[0]]  # Thumb tip
-        thumb_ip = landmarks[self.finger_pips[0]]  # Thumb IP joint (second joint)
-        thumb_mcp = landmarks[self.finger_mcps[0]]  # Thumb MCP joint (knuckle)
-        index_mcp = landmarks[self.finger_mcps[1]]  # Index finger knuckle
+        thumb_tip = landmarks[self.fingertips[0]]  # Thumb tip (landmark 4)
+        thumb_ip = landmarks[self.finger_pips[0]]  # Thumb IP joint/second joint (landmark 3)
+        thumb_mcp = landmarks[self.finger_mcps[0]]  # Thumb MCP joint/knuckle (landmark 2)
+        index_mcp = landmarks[self.finger_mcps[1]]  # Index finger knuckle (landmark 5)
 
-        # Calculate angles to determine if thumb is extended or folded
+        # Calculate angle between the three key thumb points to determine extension
+        # A straight thumb will have an angle closer to 180 degrees
         thumb_angle = self.calculate_angle(thumb_mcp, thumb_ip, thumb_tip)
 
-        # Calculate distance from thumb tip to index MCP (when thumb is folded into palm, this distance is small)
+        # Calculate distance from thumb tip to index MCP 
+        # When thumb is folded into palm or adducted, this distance is small
+        # When thumb is extended or abducted, this distance is larger
         thumb_to_index_distance = self.distance_3d(thumb_tip, index_mcp)
 
         # Calculate distance from thumb tip to palm center (landmark 9)
-        palm_center = landmarks[9]  # Palm center landmark
+        # This provides another metric for thumb extension
+        palm_center = landmarks[9]  # Palm center landmark (between index and middle finger MCPs)
         thumb_to_palm_distance = self.distance_3d(thumb_tip, palm_center)
 
-        # A folded thumb will have:
-        # 1. A smaller angle (typically < 150 degrees)
-        # 2. Be close to the index finger knuckle or palm center
+        # Determine if thumb is extended using multiple criteria
+        # A folded/non-extended thumb will typically have:
+        # 1. A smaller angle between joints (typically < 150 degrees)
+        # 2. Be close to the index finger knuckle (thumb_to_index_distance is small)
+        # 3. Be close to the palm center (thumb_to_palm_distance is small)
+        # 
+        # Note: Thresholds are scaled by hand_size to work at different distances from camera
         thumb_is_extended = (
-            thumb_angle > 150
-            and thumb_to_index_distance > 0.15 * hand_size
-            and thumb_to_palm_distance > 0.2 * hand_size
+            thumb_angle > 150  # Angle threshold for extension
+            and thumb_to_index_distance > 0.15 * hand_size  # Must be far enough from index knuckle
+            and thumb_to_palm_distance > 0.2 * hand_size  # Must be far enough from palm center
         )
 
         if thumb_is_extended:
             count += 1
 
-        # For other fingers, use a more robust method that combines angle and distance
-        for i in range(1, 5):  # For index, middle, ring, pinky
-            # Get the three points to calculate angle: MCP, PIP, and TIP
-            mcp = landmarks[self.finger_mcps[i]]
-            pip = landmarks[self.finger_pips[i]]
-            tip = landmarks[self.fingertips[i]]
+        # SECTION 2: OTHER FINGERS DETECTION (Index, Middle, Ring, Pinky)
+        # For non-thumb fingers, we use a combination of:
+        # 1. Joint angles (straighter finger = extended)
+        # 2. Distance from fingertip to palm (greater distance = extended)
+        
+        for i in range(1, 5):  # Iterate through index (1), middle (2), ring (3), pinky (4)
+            # Get the three key points needed to calculate finger extension:
+            mcp = landmarks[self.finger_mcps[i]]  # Metacarpophalangeal joint (knuckle)
+            pip = landmarks[self.finger_pips[i]]  # Proximal interphalangeal joint (middle joint)
+            tip = landmarks[self.fingertips[i]]  # Fingertip
 
             # Calculate the angle between the finger segments
+            # An extended finger will have a straighter angle (closer to 180 degrees)
+            # A curled finger will have a more acute angle (typically < 140-150 degrees)
             angle = self.calculate_angle(mcp, pip, tip)
 
             # Calculate distance from fingertip to palm center
+            # Extended fingers have tips further from the palm center
+            # Curled fingers have tips closer to the palm center
             palm_center = landmarks[9]  # Palm center landmark
             tip_to_palm_distance = self.distance_3d(tip, palm_center)
 
-            # For a closed fist, fingertips are close to the palm center
-            # and the angle is typically less than 160 degrees
-
-            # Adjust threshold based on finger (index finger might need different threshold than pinky)
+            # Adaptive thresholds for different fingers
+            # Note: Different fingers need different thresholds because:
+            # 1. Index finger tends to straighten more than others even when making a fist
+            # 2. Pinky and ring fingers tend to curl more even when partially extended
+            
+            # Angle threshold: higher for index finger (needs to be straighter to count as extended)
             angle_threshold = (
                 150 if i == 1 else 140
-            )  # Higher threshold for index finger
+            )  # 150° for index finger, 140° for others
 
             # Distance threshold as a proportion of hand size
+            # This scales automatically based on hand size/distance from camera
             distance_threshold = 0.3 * hand_size
 
             # A finger is extended if:
@@ -134,28 +164,42 @@ class FingerDetector:
         )
 
     def calculate_angle(self, point1, point2, point3):
-        """Calculate angle between three points in degrees"""
-        # Convert landmarks to numpy arrays for easier vector operations
-        p1 = (point1.x, point1.y, point1.z)
-        p2 = (point2.x, point2.y, point2.z)
-        p3 = (point3.x, point3.y, point3.z)
+        """Calculate angle between three points in 3D space (in degrees)
+        
+        This function calculates the angle formed at point2 by the lines from 
+        point2 to point1 and point2 to point3.
+        
+        Args:
+            point1, point2, point3: MediaPipe landmark points with x, y, z coordinates
+            
+        Returns:
+            angle_deg: Angle in degrees (0-180)
+        """
+        # Convert MediaPipe landmarks to coordinate tuples for vector calculations
+        p1 = (point1.x, point1.y, point1.z)  # First point coordinates
+        p2 = (point2.x, point2.y, point2.z)  # Middle point (vertex of angle)
+        p3 = (point3.x, point3.y, point3.z)  # Third point coordinates
 
-        # Calculate vectors
+        # Calculate vectors from middle point to other points
+        # v1 = vector from point2 to point1
+        # v2 = vector from point2 to point3
         v1 = (p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2])
         v2 = (p3[0] - p2[0], p3[1] - p2[1], p3[2] - p2[2])
 
-        # Calculate dot product
+        # Calculate dot product of the two vectors: v1·v2 = |v1|×|v2|×cos(θ)
         dot_product = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]
 
-        # Calculate magnitudes
+        # Calculate magnitudes (lengths) of both vectors
         mag1 = math.sqrt(v1[0] ** 2 + v1[1] ** 2 + v1[2] ** 2)
         mag2 = math.sqrt(v2[0] ** 2 + v2[1] ** 2 + v2[2] ** 2)
 
-        # Calculate angle in radians and convert to degrees
-        # Ensure we don't divide by zero and the value is within [-1, 1]
+        # Calculate angle using the dot product formula: cos(θ) = (v1·v2)/(|v1|×|v2|)
+        # Clamp value to [-1, 1] to handle floating point errors
         cos_angle = max(-1, min(1, dot_product / (mag1 * mag2)))
-        angle_rad = math.acos(cos_angle)
-        angle_deg = angle_rad * 180 / math.pi
+        
+        # Convert from radians to degrees
+        angle_rad = math.acos(cos_angle)  # arccos gives angle in radians
+        angle_deg = angle_rad * 180 / math.pi  # Convert to degrees
 
         return angle_deg
 
