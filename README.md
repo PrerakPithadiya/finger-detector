@@ -219,21 +219,15 @@ Potential enhancements for future versions:
    - Create mobile versions (Android/iOS)
    - Develop web-based version using WebRTC
 
-## 📚 Academic References
+## 🎓 Academic Context
 
-This project builds upon research in computer vision and hand tracking:
+This project was developed as part of my coursework for the Computer Engineering diploma program at Noble University. It demonstrates the practical application of computer vision concepts and programming skills acquired during my studies.
 
-1. Zhang, F., Bazarevsky, V., Vakunov, A., Tkachenka, A., Sung, G., Chang, C. L., & Grundmann, M. (2020). MediaPipe Hands: On-device Real-time Hand Tracking. *CVPR Workshop on Computer Vision for Augmented and Virtual Reality*. [arXiv:2006.10214](https://arxiv.org/abs/2006.10214)
-
-2. Lugaresi, C., Tang, J., Nash, H., McClanahan, C., Uboweja, E., Hays, M., ... & Grundmann, M. (2019). MediaPipe: A Framework for Building Perception Pipelines. *arXiv preprint*. [arXiv:1906.08172](https://arxiv.org/abs/1906.08172)
-
-3. Bradski, G. (2000). The OpenCV Library. *Dr. Dobb's Journal of Software Tools*.
-
-4. Erol, A., Bebis, G., Nicolescu, M., Boyle, R. D., & Twombly, X. (2007). Vision-based hand pose estimation: A review. *Computer Vision and Image Understanding*, 108(1-2), 52-73.
+The implementation uses industry-standard libraries (MediaPipe and OpenCV) to solve a real-world computer vision problem, showcasing both technical skills and creative problem-solving abilities.
 
 ## 🙏 Acknowledgements
 
 - [MediaPipe](https://google.github.io/mediapipe/) for their excellent hand tracking solution
 - [OpenCV](https://opencv.org/) for computer vision capabilities
 - All contributors and users of this project
-- My college professors for guidance and support in computer vision concepts
+- My professors at Noble University for their guidance and support
