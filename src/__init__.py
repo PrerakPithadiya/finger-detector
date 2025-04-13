@@ -1,0 +1,3 @@
+"""
+Finger Detector package
+"""
