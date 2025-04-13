@@ -78,3 +78,13 @@ This application uses MediaPipe's hand tracking solution to detect hand landmark
 5. Applying special logic for thumb detection, which is typically harder to track
 
 The UI provides real-time feedback with color-coded information and status messages.
+
+## Author
+
+Prerak Pithadiya
+- Email: prerak.pithadiya@gmail.com
+- GitHub: [PrerakPithadiya](https://github.com/PrerakPithadiya)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

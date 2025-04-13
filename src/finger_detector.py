@@ -1,6 +1,12 @@
 """
 Finger Detector Module
 Contains the FingerDetector class for hand and finger detection
+
+Author: Prerak Pithadiya
+Email: prerak.pithadiya@gmail.com
+GitHub: https://github.com/PrerakPithadiya
+Copyright (c) 2025 Prerak Pithadiya
+License: MIT License
 """
 
 import cv2

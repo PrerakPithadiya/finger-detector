@@ -2,6 +2,12 @@
 """
 Finger Detector Application
 Main entry point for the application
+
+Author: Prerak Pithadiya
+Email: prerak.pithadiya@gmail.com
+GitHub: https://github.com/PrerakPithadiya
+Copyright (c) 2025 Prerak Pithadiya
+License: MIT License
 """
 
 from src.finger_detector import FingerDetector
