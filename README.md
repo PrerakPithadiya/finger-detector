@@ -161,7 +161,7 @@ Contributions are welcome! If you'd like to improve the project:
 ## 👨‍💻 Author
 
 **Prerak Pithadiya**
-- Email: prerak.pithadiya@gmail.com
+- Email: prerakpithadiya@gmail.com
 - GitHub: [PrerakPithadiya](https://github.com/PrerakPithadiya)
 
 ## 📄 License

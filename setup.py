@@ -9,7 +9,7 @@ setup(
         "mediapipe>=0.8.9",
     ],
     author="Prerak Pithadiya",
-    author_email="prerak.pithadiya@gmail.com",
+    author_email="prerakpithadiya@gmail.com",
     description="A Python application that detects and counts fingers in real-time using computer vision",
     keywords="computer vision, finger detection, mediapipe, opencv",
     url="https://github.com/PrerakPithadiya/finger-detector",
